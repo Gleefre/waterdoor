@@ -15,6 +15,9 @@
 (defun win? (game)
   (>= (game-water game) *water-to-win*))
 
+(defun lose? (game)
+  (<= (game-water game) 0))
+
 (defun choose-door (game door)
   (with-slots (choosed-door water-door hint-door state) game
     (setf choosed-door door
@@ -35,10 +38,15 @@
           state :choose)))
 
 (defun accept-hint (game)
-  (guess-door game (loop for d below 3
-                         if (not (member d (list (game-choosed-door game)
-                                                 (game-hint-door game))))
-                         do (return d))))
+  (setf (game-choosed-door game)
+        (loop for d below 3
+              if (not (member d (list (game-choosed-door game)
+                                      (game-hint-door game))))
+              do (return d)))
+  (setf (game-state game) :show))
 
 (defun reject-hint (game)
+  (setf (game-state game) :show))
+
+(defun continue-game (game)
   (guess-door game (game-choosed-door game)))
