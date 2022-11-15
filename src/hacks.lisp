@@ -8,7 +8,7 @@
                    (sketch:make-font :face (sketch:load-resource (waterdoor/utils:data-path *font-name*))
                                      :color sketch:+black+
                                      :size 18))))
-  (defun sketch::make-default-font ()
+  (defun sketch::make-error-font ()
     (setf font (or font
                    (sketch:make-font :face (sketch:load-resource (waterdoor/utils:data-path *font-name*))
                                      :color sketch:+black+
