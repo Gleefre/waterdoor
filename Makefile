@@ -2,6 +2,7 @@ LISP ?= sbcl
 
 build:
 	$(LISP) --eval "(ql:quickload :deploy)" \
+		--eval "(ql:quickload :sketch)" \
 		--eval "(push :deploy *features*)" \
 		--eval "(deploy:define-resource-directory data \"resources/\")" \
 		--eval "(progn nil #+darwin (deploy:define-library cl-opengl-bindings::opengl :dont-deploy t))" \
