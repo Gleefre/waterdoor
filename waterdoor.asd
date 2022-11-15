@@ -12,6 +12,6 @@
                (:file "gui"))
 
   :defsystem-depends-on (:deploy)
-  :build-operation "deploy-op"
+  :build-operation #-darwin "deploy-op" #+darwin "osx-app-deploy-op"
   :build-pathname "waterdoor"
   :entry-point "waterdoor:gui")
