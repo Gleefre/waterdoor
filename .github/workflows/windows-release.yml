@@ -1,13 +1,10 @@
-name: Makefile CI
+name: Windows build
 on: [workflow_dispatch]
 jobs:
   build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: release-windows
-
+    - uses: actions/checkout@v3
     - name: install msys2
       uses: msys2/setup-msys2@v2
       with:
@@ -15,7 +12,6 @@ jobs:
   
     - name: install sbcl
       run: choco install sbcl
-
     - name: install quicklisp
       run: |
         curl -O https://beta.quicklisp.org/quicklisp.lisp
@@ -34,6 +30,7 @@ jobs:
     - name: download SDL2
       uses: albin-johansson/download-sdl2@v2
       with:
+        # FIXME downgraded because of sdl wav bug
         version: 2.0.22
         sources_destination: .
         binaries_destination: .
@@ -56,28 +53,22 @@ jobs:
         sources_destination: .
         binaries_destination: .
 
-    - name: prep
-      run: |
-        rm -rf bin/
-        mkdir bin/
-        cp *.dll bin/
-      shell: msys2 {0}
-
     - name: build
       run: LISP=C:/ProgramData/chocolatey/bin/sbcl.exe make
       shell: msys2 {0}
 
-    - name: remove old zip
-      run: rm -f windows-release.zip
-      shell: bash
-
-    - name: create new zip (windows)
-      run: Compress-Archive -Path .\waterdoor -DestinationPath .\windows-release
-
-    - name: Git Commit and Push
+    - name: add license and notice
       run: |
-          git add --force windows-release.zip
-          git config --global user.name 'Gleefre'
-          git config --global user.email 'Gleefre@users.noreply.github.com'
-          git commit -am "windows release built"
-          git push
+        cp NOTICE .\bin
+        cp LICENSE .\bin
+
+    - name: zip
+      run: |
+        mv .\bin .\waterdoor-windows-release
+        Compress-Archive -Path .\waterdoor-windows-release -DestinationPath .\waterdoor-windows-release
+
+    - name: upload release
+      uses: actions/upload-artifact@v3
+      with:
+        name: waterdoor-windows-release-artifact
+        path: waterdoor-windows-release.zip
